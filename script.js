@@ -15,14 +15,12 @@ jQuery(document).ready(function() {
       $dw_toc         = jQuery('#dw__toc'),            // Table of Content
       $dw_search      = jQuery('#dw__search'),         // Search form
       $dw_breadcrumbs = jQuery('#dw__breadcrumbs'),    // Breadcrumbs
+      $dw_msgarea     = jQuery('#dw__msgarea'),        // Message Area
       $media_popup    = jQuery('#media__content'),     // Media Manager (pop-up)
       $media_manager  = jQuery('#mediamanager__page'), // Media Manager (page)
       $detail_page    = jQuery('#dokuwiki__detail'),   // Detail Page
       $mode_admin     = jQuery('.mode_admin'),         // Admin mode
-      $screen_mode    = jQuery('#screen__mode'),       // Responsive Check
-      $tags           = jQuery('.mode_show .tags'),    // Tags Plugin
-      $translation    = jQuery('#dw__translation'),    // Translation Plugin
-      $discussion     = jQuery('.comment_wrapper');    // Discussion Plugin
+      $screen_mode    = jQuery('#screen__mode');       // Responsive Check
 
 
   // Icons for DokuWiki Actions
@@ -46,7 +44,7 @@ jQuery(document).ready(function() {
     ['subscribe',     'h1',     'glyphicon-bookmark text-muted'],
     ['unsubscribe',   'h1',     'glyphicon-bookmark text-muted'],
     ['draft',         'h1',     'glyphicon-edit text-muted'],
-    ['showtag',       'h1',     'glyphicon-tags text-muted'],
+    ['showtag',       'h1',     'glyphicon-tags text-muted']
   ];
 
 
@@ -79,7 +77,6 @@ jQuery(document).ready(function() {
         node  = jQuery(this);
 
     // FIXME
-        console.debug(node.data('events'), node);
     if (typeof node.data('events') === 'undefined') {
 
       jQuery(this.attributes).each(function(index, attribute) {
@@ -127,7 +124,7 @@ jQuery(document).ready(function() {
 
 
   // Tabs
-  jQuery('.tabs').addClass('nav nav-tabs');
+  //jQuery('ul.tabs').addClass('nav nav-tabs');
 
 
   // Search Hits
@@ -175,72 +172,6 @@ jQuery(document).ready(function() {
     jQuery(jQuery(icon_selector)[0]).prepend(icon_tag);
 
   });
-
-
-  // Translation Plugin
-  if ($translation.length) {
-
-    var $current = $translation.find('.cur'),
-        $lang    = $current.text(),
-        $iso     = $lang.match(/\(([a-z]*)\)/),
-        $flag    = $current.find('img');
-
-    $current.parent().addClass('active');
-    $translation.find('.wikilink2').removeClass('wikilink2').css('opacity', '0.5');
-
-    if ($flag.length) {
-      $translation.find('.dropdown-toggle i').hide();
-      $translation.find('.dropdown-toggle').prepend(
-        jQuery('<img/>').attr({
-          'src'   : $flag.attr('src'),
-          'title' : $flag.attr('title') }));
-    }
-
-  }
-
-
-  // Tags plugin
-  if ($tags.length) {
-
-    $tags.each(function() {
-
-      var $tag = jQuery(this);
-      $tag.html($tag.html().replace(/,/g, ''));
-
-      var $tagLabel = $tag.find('a').addClass('label label-default')
-                                    .prepend('<i class="glyphicon glyphicon-tag"/> ');
-
-      if ($tag.prop('tagName').toLowerCase() == 'div') {
-        $tag.hide();
-        $tagLabel.prependTo('.pageId').css('marginLeft', '3px');
-      }
-
-    });
-
-  }
-
-
-  // Discussion plugin
-  if ($discussion.length) {
-
-    $discussion.find('h2').addClass('page-header');
-    $discussion.find('.comment_buttons').addClass('text-right');
-    $discussion.find('#discussion__section').prepend('<i class="glyphicon glyphicon-comment"/> ');
-
-    $discussion.find('.hentry').addClass('panel panel-default');
-    $discussion.find('.hentry .comment_head').addClass('panel-heading');
-    $discussion.find('.hentry .comment_body').addClass('panel-body');
-    $discussion.find('.toolbar').addClass('btn-group');
-    $discussion.find('.comment_buttons [type=submit]').addClass('btn-xs');
-    $discussion.find('.comment_buttons .discussion__delete .btn').addClass('btn-danger');
-    $discussion.find('.comment_buttons .discussion__reply .btn').addClass('btn-success');
-    $discussion.find('#discussion__btn_submit').addClass('btn-success');
-
-    jQuery(document).bind('DOMNodeInserted', function(){
-      $discussion.find('.toolbutton').addClass('btn btn-xs');
-    });
-
-  }
 
 
   // Footnote
@@ -295,17 +226,17 @@ jQuery(document).ready(function() {
   jQuery('div.error')
     .removeClass('error')
     .addClass('alert alert-danger')
-    .prepend('<i class="glyphicon glyphicon-remove"/> ');
+    .prepend('<i class="glyphicon glyphicon-exclamation-sign"/> ');
 
   jQuery('div.success')
     .removeClass('success')
     .addClass('alert alert-success')
-    .prepend('<i class="glyphicon glyphicon-ok"/> ');
+    .prepend('<i class="glyphicon glyphicon-ok-sign"/> ');
 
   jQuery('div.notify')
     .removeClass('notify')
     .addClass('alert alert-warning')
-    .prepend('<i class="glyphicon glyphicon-bell"/> ');
+    .prepend('<i class="glyphicon glyphicon-warning-sign"/> ');
 
 
   // Sidebar
@@ -366,26 +297,62 @@ jQuery(document).ready(function() {
 
   // Detail page
   if ($detail_page.length) {
-    $detail_page.find('dl').addClass('dl-horizontal');
-    $detail_page.find('.img_backto').addClass('btn btn-success').prepend('<i class="glyphicon glyphicon-arrow-left"/> ');
-    $detail_page.find('.mediaManager').addClass('btn btn-default').prepend('<i class="glyphicon glyphicon-picture"/> ');
+
+    $detail_page.find('dl')
+      .addClass('dl-horizontal');
+    $detail_page.find('.img_backto')
+      .addClass('btn btn-success')
+      .prepend('<i class="glyphicon glyphicon-arrow-left"/> ');
+    $detail_page.find('.mediaManager')
+      .addClass('btn btn-default')
+      .prepend('<i class="glyphicon glyphicon-picture"/> ');
+
   }
 
   // Administration
   if ($mode_admin.length) {
 
     // Extension page
-    var $ext_actions = $mode_admin.find('.actions');
-    $ext_actions.addClass('btn-group');
-    $ext_actions.find('.permerror').addClass('pull-left');
-    $ext_actions.find('.btn').addClass('btn-xs');
-    $ext_actions.find('.uninstall').addClass('btn-danger');
-    $ext_actions.find('.enable').addClass('btn-success');
-    $ext_actions.find('.disable').addClass('btn-warning');
+    var $ext_manager = $mode_admin.find('#extension__manager'),
+        $ext_actions = $ext_manager.find('.actions');
 
-    $mode_admin.find('#dokuwiki__content [name=submit]').addClass('btn-success');
+    $ext_actions.addClass('btn-group');
+
+    $ext_actions.find('.permerror')
+      .addClass('pull-left');
+
+    $ext_actions.find('.btn')
+      .addClass('btn-xs');
+
+    $ext_actions.find('.uninstall')
+      .addClass('btn-danger')
+      .prepend('<i class="glyphicon glyphicon-trash"/> ');
+
+    $ext_actions.find('.install, .update, .reinstall')
+      .addClass('btn-primary')
+      .prepend('<i class="glyphicon glyphicon-download-alt"/> ');
+
+    $ext_actions.find('.enable')
+      .addClass('btn-success')
+      .prepend('<i class="glyphicon glyphicon-ok"/> ');
+
+    $ext_actions.find('.disable')
+      .addClass('btn-warning')
+      .prepend('<i class="glyphicon glyphicon-ban-circle"/> ');
+
+    $mode_admin.find('#dokuwiki__content [name=submit]')
+      .addClass('btn-success');
+
+    $ext_manager.find('form.search button')
+      .prepend('<i class="glyphicon glyphicon-search"/> ');
+
+    $ext_manager.find('form.install button')
+      .prepend('<i class="glyphicon glyphicon-download-alt"/> ');
 
   }
+
+
+  /* DOKUWIKI:include plugins.js */
 
 
 });

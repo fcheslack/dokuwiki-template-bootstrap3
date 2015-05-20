@@ -66,6 +66,7 @@
               tpl_link(wl('user:'.$_SERVER['REMOTE_USER']), '<i class="glyphicon glyphicon-user"></i><span class="hidden-lg hidden-md hidden-sm"> '. userlink(null, true) . '</span>', 'title="'.userlink(null, true).'"'); /* 'Logged in as ...' */
             } ?>
           </li>
+          <?php echo _tpl_action_item('register', 'glyphicon glyphicon-edit') ?>
           <?php echo _tpl_action_item('login', 'glyphicon glyphicon-log-'. (!empty($_SERVER['REMOTE_USER']) ? 'out' : 'in')) ?>
         </ul>
 

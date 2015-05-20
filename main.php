@@ -195,7 +195,9 @@ require "../../config/theme/vars.inc.php";
         <span class="label label-default"><?php echo hsc($ID) ?></span>
       </p>
 
-      <?php html_msgarea() ?>
+      <div id="dw__msgarea">
+        <?php html_msgarea() ?>
+      </div>
 
       <main class="main row" role="main">
 
