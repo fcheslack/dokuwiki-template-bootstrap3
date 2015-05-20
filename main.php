@@ -8,21 +8,25 @@
  */
 
 if (!defined('DOKU_INC')) die(); /* must be run from within DokuWiki */
+
+$baseDomain   = $conf['zotero_www_basedomain'];
+$baseURL   = $conf['zotero_www_baseurl'];
+$staticPath = $conf['zotero_www_staticPath'];
+$staticServerPath = $conf['zotero_www_staticServerPath'];
+$forumsURL = $conf['zotero_www_forumsurl'];
+
 @require_once(dirname(__FILE__).'/tpl_functions.php'); /* include hook for template functions */
 header('X-UA-Compatible: IE=edge,chrome=1');
 
 include_once(dirname(__FILE__).'/tpl_global.php'); // Include template global variables
 
-?><!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $conf['lang'] ?>"
-  lang="<?php echo $conf['lang'] ?>" dir="<?php echo $lang['direction'] ?>" class="no-js">
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+require "../../config/theme/vars.inc.php";
+?>
+<?php include '../../config/theme/head_start.php';?>
   <title><?php tpl_pagetitle() ?> [<?php echo strip_tags($conf['title']) ?>]</title>
   <script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <?php echo tpl_favicon(array('favicon', 'mobile')) ?>
+  <?php// echo tpl_favicon(array('favicon', 'mobile')) ?>
   <?php tpl_includeFile('meta.html') ?>
   <?php foreach ($bootstrapStyles as  $bootstrapStyle): ?>
   <link type="text/css" rel="stylesheet" href="<?php echo $bootstrapStyle; ?>" />
@@ -35,6 +39,35 @@ include_once(dirname(__FILE__).'/tpl_global.php'); // Include template global va
   <style type="text/css">
     body { padding-top: <?php echo (($fixedTopNavbar) ? '70' : '20'); ?>px; }
   </style>
+  <!-- zotero.org head_end -->
+    <!-- css -->
+    <!-- fontawesome font CDN -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="<?=$staticUrl('/fonts/glyphicons/css/glyphicons.css')?>" rel="stylesheet">
+    <link href="<?=$staticUrl('/fonts/glyphicons_halflings/css/glyphicons-halflings.css')?>" rel="stylesheet">
+    
+    <!-- theme_style.css, zotero_icons_sprite.css, and bootstrap_library_style.css are included in zorg_style via zorg.less -->
+    <link rel="stylesheet" href="<?=$version("/css/zorg_style.css", $staticPath)?>"
+        type="text/css" media="screen" charset="utf-8"/>
+    <!-- css -->
+    <?/*
+    <script src="<?=$staticUrl('/library/modernizr/modernizr-1.7.min.js');?>"></script>
+    <script type="text/javascript" charset="utf-8" src="<?=$version('/library/jquery/jquery-all.js', $staticPath);?>"></script>
+    <script type="text/javascript" charset="utf-8" src="<?=$version('/js/compiled/_zoterowwwAll.bugly.js', $staticPath);?>"></script>
+    */?>
+    <?/*<script type="text/javascript" charset="utf-8" src="<?=$version('/library/bootstrap/js/bootstrap.min.js', $staticPath);?>"></script>*/?>
+    <?/*
+    <script type="text/javascript" charset="utf-8" src="<?=$version('/library/typeahead/typeahead.js', $staticPath);?>"></script>
+    <script type="text/javascript" charset="utf-8">
+        if(typeof zoteroData == 'undefined'){
+            var zoteroData = {};
+        }
+        var baseURL = "<?=$baseUrl?>";
+        var staticPath = "<?=$staticPath?>";
+        var baseDomain = "<?=$baseDomain?>";
+        var nonZendPage = true;
+    </script>
+    */?>
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -43,8 +76,94 @@ include_once(dirname(__FILE__).'/tpl_global.php'); // Include template global va
   <![endif]-->
 </head>
 <?php tpl_flush() ?>
-<body class="<?php echo (($bootstrapTheme == 'bootswatch') ? $bootswatchTheme : $bootstrapTheme) . ($pageOnPanel ? ' page-on-panel' : ''); ?>">
+<body class="<?php echo (($bootstrapTheme == 'bootswatch') ? $bootswatchTheme : $bootstrapTheme) . ($pageOnPanel ? ' page-on-panel' : ''); ?> full-width">
   <!--[if lte IE 7 ]><div id="IE7"><![endif]--><!--[if IE 8 ]><div id="IE8"><![endif]-->
+  <!-- Header -->
+  <!-- zotero.org body_start -->
+        <nav id="primarynav" class="navbar navbar-default" role="navigation" style="margin-bottom:20px;">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#primary-nav-linklist">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="glyphicons fonticon glyphicons-menu-hamburger"></span>
+                    </button>
+                    <a class="navbar-brand hidden-sm hidden-xs" href="<?=$baseUrl;?>/"><img src="<?=$staticUrl('/images/theme/zotero.png');?>" alt="Zotero" height="20px"></a>
+                    <a class="navbar-brand visible-sm-block visible-xs-block" href="<?=$baseUrl;?>/"><img src="<?=$staticUrl('/images/theme/zotero_theme/zotero_48.png');?>" alt="Zotero" height="24px"></a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="primary-nav-linklist">
+                  <ul class="nav navbar-nav">
+                      <li><a href="<?=$groupsUrl?>" class="groups">Groups</a></li>
+                      <li <?=$documentationActive ? "class='active'" : "";?>><a href="<?=$documentationUrl?>" class="documentation">Documentation</a></li>
+                      <li <?=$forumsActive ? "class='active'" : "";?>><a href="<?=$forumsUrl?>" class="forums">Forums</a></li>
+                      <li><a href="<?=$getinvolvedUrl?>" class="getinvolved">Get Involved</a></li>
+                  </ul>
+                  <?php
+                      $searchID = 'simple-search';
+                      $searchPlaceholderText = 'Search Support';
+                  ?>
+                  <form class="navbar-form navbar-left" role="search" action="<?=($baseUrl . '/search')?>" id="<?=$searchID;?>">
+                      <div class="input-group">
+                          <input type="text" class="form-control" placeholder="<?=$searchPlaceholderText;?>">
+                          <span class="input-group-btn">
+                              <button type="submit" class="btn btn-default"><span class="glyphicons fonticon glyphicons-search"></span></button>
+                          </span>
+                      </div>
+                  </form>
+              
+                  <!-- DOKUWIKI CONTROLS -->
+                    <?php
+                      include_once(dirname(__FILE__).'/tpl_tools_menu.php');
+                      include_once(dirname(__FILE__).'/tpl_theme_switcher.php');
+                      @include_once(dirname(__FILE__).'/tpl_translation.php');
+                    ?>
+                  <!-- /DOKUWIKI CONTROLS -->
+                  <ul class="nav navbar-nav navbar-right">
+                  <? if ($userInfo): ?>
+                      <button type="button" href="#" class="btn btn-default navbar-btn dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                          <?=htmlspecialchars($displayName)?> <span class="glyphicons fonticon glyphicons-menu-hamburger"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                          <li><a href="<?=$settingsUrl?>">Settings</a></li>
+                          <li><a href="<?=$inboxUrl?>">Inbox</a></li>
+                          <li><a href="<?=$downloadUrl?>">Download</a></li>
+                          <?php if($userIsAdmin):?>
+                              <li><a href="<?=$dashboardUrl?>">Admin Dashboard</a></li>
+                          <?php endif;?>
+                          <li class="divider"></li>
+                          <li><a href="<?=$documentationUrl;?>" class="documentation">Documentation</a></li>
+                          <li><a href="<?=$forumsUrl?>/categories/" class="forums">Forums</a></li>
+                          <li class="divider"></li>
+                          <li><a href="<?=$logoutUrl?>">Log Out</a></li>
+                      </ul>
+                  <?else:?>
+                      <button type="button" href="#" class="btn btn-default navbar-btn dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                          <span class="glyphicons fonticon glyphicons-menu-hamburger"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                          <li><a href="<?=$loginUrl?>">Log In</a></li>
+                          <li><a href="<?=$downloadUrl?>">Download</a></li>
+                          <li class="divider"></li>
+                          <li><a href="<?=$documentationUrl?>" class="documentation">Documentation</a></li>
+                          <li><a href="<?=$forumsUrl?>/categories/" class="forums">Forums</a></li>
+                      </ul>
+                  <?endif;?>
+                </ul>
+              </div>
+            </div>
+        </nav>
+
+
+        <div id="content" class="container-fluid">
+            <?if($outdatedVersion()):?>
+                <div id="outdated-version-notification" style="background-color:#FFFECC; text-align:left; border:1px solid #FAEBB1; padding:5px 20px; margin-bottom:10px;">
+                <p style="margin: 0; text-align: center;">Your version of Zotero for Firefox is out of date. <a href="https://www.zotero.org/download">Download the latest version.</a></p>
+                </div>
+                <?error_log($_SERVER['HTTP_X_ZOTERO_VERSION']);?>
+            <?endif;?>
+            
+            <div class="row">
+  <!-- end zotero.org body_start -->
 
   <div id="dokuwiki__site" class="container<?php echo ($fluidContainer) ? '-fluid' : '' ?>">
     <div id="dokuwiki__top" class="site <?php echo tpl_classes(); ?> <?php echo ($showSidebar) ? 'hasSidebar' : ''; ?>">
@@ -53,7 +172,7 @@ include_once(dirname(__FILE__).'/tpl_global.php'); // Include template global va
 
       <!-- header -->
       <div id="dokuwiki__header">
-        <?php @require_once('tpl_navbar.php'); ?>
+        <?php //@require_once('tpl_navbar.php'); ?>
       </div>
       <!-- /header -->
 
@@ -180,5 +299,4 @@ include_once(dirname(__FILE__).'/tpl_global.php'); // Include template global va
     </div>
   </div>
   <!--[if ( lte IE 7 | IE 8 ) ]></div><![endif]-->
-</body>
-</html>
+<?php include '../../config/theme/body_end.php'; ?>
